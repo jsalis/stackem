@@ -1,7 +1,8 @@
 use macroquad::prelude::*;
 
 const BOARD_WIDTH: usize = 32;
-const BOARD_HEIGHT: usize = 54;
+const BOARD_HEIGHT: usize = 32;
+const CELL_SIZE: f32 = 12.0;
 const INITIAL_LAYER_WIDTH: u8 = 12;
 
 enum Direction {
@@ -68,19 +69,27 @@ async fn main() {
                 }
             }
             let layer_width = get_layer_width(game.board, level);
-            if layer_width == 0 {
-                game_over = true
-            } else {
+            if layer_width > 0 {
                 speed *= 0.97;
                 level += 1;
-                for i in 0..layer_width {
-                    game.board[level as usize][i as usize] = 1;
+                if (level as usize) < BOARD_HEIGHT {
+                    for i in 0..layer_width {
+                        game.board[level as usize][i as usize] = 1;
+                    }
+                } else {
+                    game_over = true;
                 }
+            } else {
+                game_over = true;
             }
         }
 
         if game_over {
-            // TODO
+            if (level as usize) == BOARD_HEIGHT {
+                draw_text(format!("YOU ARE WINNER!").as_str(), 8.0, 60.0, 60.0, GREEN);
+            } else {
+                draw_text(format!("GAME OVER").as_str(), 8.0, 60.0, 60.0, GREEN);
+            }
         } else if get_time() - last_update > speed {
             last_update = get_time();
             match move_direction {
@@ -130,9 +139,9 @@ async fn main() {
         for (j, row) in game.board.iter().rev().enumerate() {
             for (i, el) in row.iter().enumerate() {
                 if *el == 1 {
-                    let x = i as f32 * 10.0 + 8.0;
-                    let y = j as f32 * 10.0 + 32.0;
-                    draw_rectangle(x, y, 8.0, 8.0, GREEN);
+                    let x = i as f32 * (CELL_SIZE + 2.0) + 8.0;
+                    let y = j as f32 * (CELL_SIZE + 2.0) + 80.0;
+                    draw_rectangle(x, y, CELL_SIZE, CELL_SIZE, GREEN);
                 }
             }
         }
