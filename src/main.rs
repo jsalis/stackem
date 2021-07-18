@@ -13,12 +13,14 @@ enum Direction {
 #[derive(Debug)]
 struct Game {
     board: [[u8; BOARD_WIDTH]; BOARD_HEIGHT],
+    is_over: bool,
 }
 
 impl Game {
     fn new() -> Game {
         Game {
             board: [[0; BOARD_WIDTH]; BOARD_HEIGHT],
+            is_over: false,
         }
     }
 }
@@ -38,7 +40,6 @@ async fn main() {
     let mut last_update = get_time();
     let mut speed = 0.1;
     let mut level = 0;
-    let mut game_over = false;
     for i in 0..INITIAL_LAYER_WIDTH {
         game.board[level as usize][i as usize] = 1;
     }
@@ -46,8 +47,8 @@ async fn main() {
     loop {
         clear_background(BLACK);
 
-        if game_over && is_key_pressed(KeyCode::Space) {
-            game_over = false;
+        if game.is_over && is_key_pressed(KeyCode::Space) {
+            game.is_over = false;
             speed = 0.1;
             level = 0;
             for i in 0..BOARD_HEIGHT {
@@ -60,9 +61,9 @@ async fn main() {
             }
         }
 
-        if !game_over && is_key_pressed(KeyCode::Down) {
+        if !game.is_over && is_key_pressed(KeyCode::Down) {
             if level > 0 {
-                for i in 0..BOARD_WIDTH - 1 {
+                for i in 0..BOARD_WIDTH {
                     if game.board[(level - 1) as usize][i as usize] == 0 {
                         game.board[level as usize][i as usize] = 0;
                     }
@@ -77,14 +78,14 @@ async fn main() {
                         game.board[level as usize][i as usize] = 1;
                     }
                 } else {
-                    game_over = true;
+                    game.is_over = true;
                 }
             } else {
-                game_over = true;
+                game.is_over = true;
             }
         }
 
-        if game_over {
+        if game.is_over {
             if (level as usize) == BOARD_HEIGHT {
                 draw_text(format!("YOU ARE WINNER!").as_str(), 8.0, 60.0, 60.0, GREEN);
             } else {
