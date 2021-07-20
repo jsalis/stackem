@@ -1,4 +1,4 @@
 # https://docs.netlify.com/configure-builds/file-based-configuration
 [build]
-  command = "build/release_wasm"
-  publish = "wasm"
+command = "build/release_wasm"
+publish = "wasm"
